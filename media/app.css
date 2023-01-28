@@ -1,0 +1,12 @@
+body {
+    height: 100%;
+    margin: 0;
+    width: 100%;
+    overflow: hidden;
+    font-size: var(--vscode-editor-font-size);
+    font-family: var(--vscode-editor-font-family);
+}
+
+#graphiql {
+    height: 100vh;
+}

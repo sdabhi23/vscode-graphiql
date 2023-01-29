@@ -1,9 +1,28 @@
 import * as vscode from "vscode";
 
+const GLOBAL_STATE_KEY = 'vscode-graphiql_graphqlEndpoint'
+
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
-    vscode.commands.registerCommand("vscode-graphiql.openBrowser", () => {
-      GraphiqlPanel.createOrShow(context.extensionUri);
+    vscode.commands.registerCommand("vscode-graphiql.openBrowser", async () => {
+      const graphqlEndpoint = await vscode.window.showInputBox({
+        placeHolder: 'Enter the GraphQL endpoint',
+        validateInput: urlString => {
+            try {
+              let url = new URL(urlString);
+              return null;
+            }
+            catch(e){
+              return "Please enter a valid url";
+            }
+        }
+      });
+      if(graphqlEndpoint === undefined) {
+        vscode.window.showErrorMessage("Can not open GraphiQL without a valid GraphQL endpoint")
+      } else {
+        context.globalState.update(GLOBAL_STATE_KEY, graphqlEndpoint)
+        GraphiqlPanel.createOrShow(context.extensionUri, context.globalState);
+      }
     })
   );
 
@@ -12,12 +31,11 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.window.registerWebviewPanelSerializer(GraphiqlPanel.viewType, {
       async deserializeWebviewPanel(
         webviewPanel: vscode.WebviewPanel,
-        state: any
+        _state: any
       ) {
-        console.log(`Got state: ${state}`);
         // Reset the webview options so we use latest uri for `localResourceRoots`.
         webviewPanel.webview.options = getWebviewOptions(context.extensionUri);
-        GraphiqlPanel.revive(webviewPanel, context.extensionUri);
+        GraphiqlPanel.revive(webviewPanel, context.extensionUri, context.globalState);
       },
     });
   }
@@ -47,8 +65,9 @@ class GraphiqlPanel {
   private readonly _panel: vscode.WebviewPanel;
   private readonly _extensionUri: vscode.Uri;
   private _disposables: vscode.Disposable[] = [];
+  private _graphqlEnpoint: string = '';
 
-  public static createOrShow(extensionUri: vscode.Uri) {
+  public static createOrShow(extensionUri: vscode.Uri, globalState: vscode.Memento) {
     const column = vscode.window.activeTextEditor
       ? vscode.window.activeTextEditor.viewColumn
       : undefined;
@@ -67,16 +86,17 @@ class GraphiqlPanel {
       getWebviewOptions(extensionUri)
     );
 
-    GraphiqlPanel.currentPanel = new GraphiqlPanel(panel, extensionUri);
+    GraphiqlPanel.currentPanel = new GraphiqlPanel(panel, extensionUri, globalState);
   }
 
-  public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
-    GraphiqlPanel.currentPanel = new GraphiqlPanel(panel, extensionUri);
+  public static revive(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, globalState: vscode.Memento) {
+    GraphiqlPanel.currentPanel = new GraphiqlPanel(panel, extensionUri, globalState);
   }
 
-  private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
+  private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, globalState: vscode.Memento) {
     this._panel = panel;
     this._extensionUri = extensionUri;
+    this._graphqlEnpoint = globalState.get(GLOBAL_STATE_KEY, '')
 
     // Set the webview's initial html content
     const webview = this._panel.webview;
@@ -187,7 +207,7 @@ class GraphiqlPanel {
 					ReactDOM.render(
 						React.createElement(GraphiQL, {
 							fetcher: GraphiQL.createFetcher({
-								url: 'https://swapi-graphql.netlify.app/.netlify/functions/index',
+								url: '${this._graphqlEnpoint}',
 							}),
 							defaultEditorToolsVisibility: true,
 						}),

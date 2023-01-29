@@ -22,3 +22,7 @@ reach-portal {
   --font-size-inline-code: var(--vscode-editor-font-size);
   --font-size-body: var(--vscode-editor-font-size);
 }
+
+.graphiql-container .graphiql-editor-tools button.active {
+  background: hsla(var(--color-neutral), 0.15);
+}

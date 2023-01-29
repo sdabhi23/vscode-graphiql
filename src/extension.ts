@@ -156,7 +156,7 @@ class GraphiqlPanel {
     const stylesAppPath = vscode.Uri.joinPath(
       this._extensionUri,
       "media",
-      "vscode.css"
+      "app.css"
     );
     const stylesAppUri = webview.asWebviewUri(stylesAppPath);
 

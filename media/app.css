@@ -1,12 +1,24 @@
 body {
-    height: 100%;
-    margin: 0;
-    width: 100%;
-    overflow: hidden;
-    font-size: var(--vscode-editor-font-size);
-    font-family: var(--vscode-editor-font-family);
+  height: 100%;
+  margin: 0;
+  width: 100%;
+  overflow: hidden;
 }
 
 #graphiql {
-    height: 100vh;
+  height: 100vh;
+}
+
+.graphiql-container,
+.CodeMirror-info,
+.CodeMirror-lint-tooltip,
+reach-portal {
+  /* font family overrides */
+  --font-family: var(--vscode-editor-font-family);
+  --font-family-mono: var(--vscode-editor-font-family);
+
+  /* font size overrides */
+  --font-size-hint: var(--vscode-editor-font-size);
+  --font-size-inline-code: var(--vscode-editor-font-size);
+  --font-size-body: var(--vscode-editor-font-size);
 }

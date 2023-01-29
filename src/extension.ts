@@ -5,13 +5,17 @@ const NEW_ENDPOINT_OPTION = "Enter new endpoint";
 const COPY_TO_CLIPBOARD_OPTION = "Copy to clipboard";
 
 export function activate(context: vscode.ExtensionContext) {
+
   context.subscriptions.push(
     vscode.commands.registerCommand("vscode-graphiql.openBrowser", async () => {
+
       const lastUsedEndpoint = context.globalState.get(GLOBAL_STATE_ENDPOINT_KEY, "");
+
       let graphqlEndpoint = await vscode.window.showQuickPick([NEW_ENDPOINT_OPTION, lastUsedEndpoint], {
         ignoreFocusOut: true,
         placeHolder: "Pick a GraphQL endpoint",
       });
+
       if (graphqlEndpoint === NEW_ENDPOINT_OPTION) {
         graphqlEndpoint = await vscode.window.showInputBox({
           placeHolder: "Enter the GraphQL endpoint",
@@ -26,6 +30,7 @@ export function activate(context: vscode.ExtensionContext) {
           ignoreFocusOut: true,
         });
       }
+
       if (graphqlEndpoint === undefined) {
         vscode.window.showErrorMessage("Can not open GraphiQL without a valid GraphQL endpoint");
       } else {
@@ -37,8 +42,11 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand("vscode-graphiql.showCurrentURL", async () => {
+
       const lastUsedEndpoint = context.globalState.get(GLOBAL_STATE_ENDPOINT_KEY, "");
+
       const command = await vscode.window.showInformationMessage(`Current GraphQL Endpoint:\n${lastUsedEndpoint}`, COPY_TO_CLIPBOARD_OPTION);
+
       if (command === COPY_TO_CLIPBOARD_OPTION) {
         vscode.env.clipboard.writeText(lastUsedEndpoint);
       }
@@ -110,6 +118,9 @@ class GraphiqlPanel {
     this._panel = panel;
     this._extensionUri = extensionUri;
     this._graphqlEnpoint = globalState.get(GLOBAL_STATE_ENDPOINT_KEY, "");
+
+    // leaving this piece of code here till we figure out a way to programmatically theme GraphiQL reliably
+    // vscode.window.showInformationMessage(vscode.ColorThemeKind[vscode.window.activeColorTheme.kind]);
 
     // Set the webview's initial html content
     const webview = this._panel.webview;
@@ -199,6 +210,7 @@ class GraphiqlPanel {
 								url: '${this._graphqlEnpoint}',
 							}),
 							defaultEditorToolsVisibility: true,
+              showPersistHeadersSettings: false,
 						}),
 						document.getElementById('graphiql'),
 					);

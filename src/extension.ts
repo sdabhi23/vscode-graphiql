@@ -187,7 +187,7 @@ class GraphiqlPanel {
 					ReactDOM.render(
 						React.createElement(GraphiQL, {
 							fetcher: GraphiQL.createFetcher({
-								url: 'http://localhost:6363/api/graphql/admin/database_erd',
+								url: 'https://swapi-graphql.netlify.app/.netlify/functions/index',
 							}),
 							defaultEditorToolsVisibility: true,
 						}),

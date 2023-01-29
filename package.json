@@ -18,6 +18,10 @@
       {
         "command": "vscode-graphiql.openBrowser",
         "title": "Open Graphiql"
+      },
+      {
+        "command": "vscode-graphiql.showCurrentURL",
+        "title": "Show Current GraphQL Endpoint"
       }
     ]
   },

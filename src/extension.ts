@@ -1,16 +1,18 @@
 import * as vscode from "vscode";
 
 const GLOBAL_STATE_ENDPOINT_KEY = "vscode-graphiql_graphqlEndpoint";
+const NEW_ENDPOINT_OPTION = "Enter new endpoint";
+const COPY_TO_CLIPBOARD_OPTION = "Copy to clipboard";
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand("vscode-graphiql.openBrowser", async () => {
       const lastUsedEndpoint = context.globalState.get(GLOBAL_STATE_ENDPOINT_KEY, "");
-      let graphqlEndpoint = await vscode.window.showQuickPick(["Enter new endpoint", lastUsedEndpoint], {
+      let graphqlEndpoint = await vscode.window.showQuickPick([NEW_ENDPOINT_OPTION, lastUsedEndpoint], {
         ignoreFocusOut: true,
         placeHolder: "Pick a GraphQL endpoint",
       });
-      if (graphqlEndpoint === "Enter new endpoint") {
+      if (graphqlEndpoint === NEW_ENDPOINT_OPTION) {
         graphqlEndpoint = await vscode.window.showInputBox({
           placeHolder: "Enter the GraphQL endpoint",
           validateInput: (urlString) => {
@@ -33,8 +35,17 @@ export function activate(context: vscode.ExtensionContext) {
     })
   );
 
+  context.subscriptions.push(
+    vscode.commands.registerCommand("vscode-graphiql.showCurrentURL", async () => {
+      const lastUsedEndpoint = context.globalState.get(GLOBAL_STATE_ENDPOINT_KEY, "");
+      const command = await vscode.window.showInformationMessage(`Current GraphQL Endpoint:\n${lastUsedEndpoint}`, COPY_TO_CLIPBOARD_OPTION);
+      if (command === COPY_TO_CLIPBOARD_OPTION) {
+        vscode.env.clipboard.writeText(lastUsedEndpoint);
+      }
+    })
+  );
+
   if (vscode.window.registerWebviewPanelSerializer) {
-    // Make sure we register a serializer in activation event
     vscode.window.registerWebviewPanelSerializer(GraphiqlPanel.viewType, {
       async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, _state: any) {
         // Reset the webview options so we use latest uri for `localResourceRoots`.

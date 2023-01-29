@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-const GLOBAL_STATE_KEY = 'vscode-graphiql_graphqlEndpoint'
+const GLOBAL_STATE_KEY = 'vscode-graphiql_graphqlEndpoint';
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
@@ -18,9 +18,9 @@ export function activate(context: vscode.ExtensionContext) {
         }
       });
       if(graphqlEndpoint === undefined) {
-        vscode.window.showErrorMessage("Can not open GraphiQL without a valid GraphQL endpoint")
+        vscode.window.showErrorMessage("Can not open GraphiQL without a valid GraphQL endpoint");
       } else {
-        context.globalState.update(GLOBAL_STATE_KEY, graphqlEndpoint)
+        context.globalState.update(GLOBAL_STATE_KEY, graphqlEndpoint);
         GraphiqlPanel.createOrShow(context.extensionUri, context.globalState);
       }
     })
@@ -96,7 +96,7 @@ class GraphiqlPanel {
   private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri, globalState: vscode.Memento) {
     this._panel = panel;
     this._extensionUri = extensionUri;
-    this._graphqlEnpoint = globalState.get(GLOBAL_STATE_KEY, '')
+    this._graphqlEnpoint = globalState.get(GLOBAL_STATE_KEY, '');
 
     // Set the webview's initial html content
     const webview = this._panel.webview;
